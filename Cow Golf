@@ -1,0 +1,93 @@
+Cow Golf
+[ Memory: 16 MB, CPU: 1 sec ]
+
+The seven strangest cows (Bessie, Elsie, Daisy, Gertie, Annabelle, Maggie, and Henrietta) on Farmer John’s farm have collectively decided to take up cow golf as a hobby this summer. The summer is N (1 <= N <= 100) days long and, on each day, a single cow will play a round of cow golf. This cow’s name and score S_i (1 <= S_i <= 100) is recorded in a log.
+
+At the end of the summer, the cows want to know who won their competition. The score of a cow is equal to the cumulative sum of each of their individual daily scores. Unlike normal golf (where the lowest score is best), the winner of cow golf is whomever has the smallest score strictly larger than the minimum score. Given the log of scores, determine who won the competition. If multiple cows won, print “Tie”.
+
+If a cow does not appear in the log, you should assume their score is 0.
+
+INPUT FORMAT:
+
+Line 1: One integer: N
+Line 2…N+1: One string and one integer: The name of the cow playing and their score S_i
+
+OUTPUT FORMAT:
+
+Line 1: The name of the cow who won the summer’s competition or the word “Tie” if multiple cows won.
+
+SAMPLE INPUT:
+
+8
+Elsie 4
+Daisy 17
+Bessie 2
+Gertie 6
+Annabelle 4
+Bessie 3
+Henrietta 7
+Maggie 4
+SAMPLE OUTPUT:
+
+Bessie
+In this example, Bessie’s final score is 5, which is the smallest score strictly larger than the minimum score of 4.
+
+Code:
+import java.util.*;
+
+public class CowGolf {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int days = scanner.nextInt(); 
+        scanner.nextLine(); 
+        
+        String[] cows = {"Bessie", "Elsie", "Daisy", "Gertie", "Annabelle", "Maggie", "Henrietta"};
+        int[] scores = new int[7]; 
+        
+        for (int i = 0; i < days; i++) {
+            String name = scanner.next(); // cow name of day
+            int score = scanner.nextInt(); // score for day
+            scanner.nextLine(); // Consume the newline
+            
+            // Find the cow in the array and update its score
+            for (int j = 0; j < 7; j++) {
+                if(name.equals(cows[j])){
+                    scores[j] += score; // Add the score to that particular cow's total
+                    break; 
+                }
+            }
+        }
+        
+        // Find the minimum score
+        int min = 100000000;
+        for (int i = 0; i < 7; i++) {
+            if (scores[i] < min) {
+                min = scores[i];
+            }
+        }
+        
+        // Find the winning score
+        int winnerScore = 1000000000;
+        for (int i = 0; i < 7; i++) {
+            if (scores[i] > min && scores[i] < winnerScore) {
+                winnerScore = scores[i];
+            }
+        }
+
+        // Count how many cows have the winning score and find the winner
+        int winnerCount = 0;
+        String winner = "";
+        for (int i = 0; i < 7; i++) {
+            if (scores[i] == winnerScore) {
+                winnerCount++;
+                winner = cows[i];
+            }
+        }
+
+        if (winnerCount > 1 || winnerCount < 1) {
+            System.out.print("Tie");
+        } else if (winnerCount == 1) {
+            System.out.print(winner);
+        }
+    }
+}
