@@ -1,0 +1,100 @@
+Crystal Balls
+[ Memory: 64 MB, CPU: 1 sec ]
+One day, Farmer John obtained some peculiar looking crystal balls, and he gave them to the cows to play with. The cows discovered that each crystal ball can display four numbers when the cows summon them, and each number shows up with an equal probability. Naturally, the cows want to compete against each other. They decide to play a two-player game where both crystal balls are summoned, and the one with the greater number wins. If it’s a tie, the game continues until one of the crystal balls wins.
+
+Now, consider the three following crystal balls:
+
+Ball A can display the numbers 4, 5, 6, and 7
+Ball B can display the numbers 2, 4, 5, and 10
+Ball C can display the numbers 1, 4, 8, and 9
+In this set of balls: Ball A beats Ball B, Ball B beats Ball C, and Ball C beats Ball A. None of the balls can beat both the other two. In this case, we say that they are “non-transitive”. Given two of the three balls, can you find another crystal ball to make them satisfy the non-transitive property? Each number must be in the range 1 to 10.
+
+INPUT FORMAT:
+
+Each input consists of several independent test cases, all of which need to be solved correctly to solve the entire input case. The first line of input contains T (1 <= T <= 10), the number of test cases you need to solve. The following T lines each describe one test case in terms of 8 numbers: the numbers of crystal ball A, and the numbers of crystal ball B. All numbers are in the range 1 through 10, not necessarily in sorted order. The same number might appear multiple times, even on the same crystal ball.
+
+OUTPUT FORMAT:
+
+Please write T lines of output. The kth line should be 'yes' if it is possible to design a die C to make the kth test case into a set of non-transitive crystal balls, and 'no' otherwise.
+
+SAMPLE INPUT:
+
+3
+3 1 6 6 8 2 3 1
+5 10 1 8 5 5 9 5
+1 10 10 7 5 10 6 5
+SAMPLE OUTPUT:
+
+yes
+yes
+no
+
+My Code: 
+
+import java.util.*;
+
+public class CrystalBalls {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int T = scanner.nextInt();
+        
+        for (int t = 0; t < T; t++) {
+            int[] ballA = new int[4];
+            int[] ballB = new int[4];
+            
+            for (int i = 0; i < 4; i++) {
+                ballA[i] = scanner.nextInt();
+            }
+            for (int i = 0; i < 4; i++) {
+                ballB[i] = scanner.nextInt();
+            }
+            
+            System.out.println(canMakeNonTransitive(ballA, ballB) ? "yes" : "no");
+        }
+        
+        scanner.close();
+    }
+    
+    private static boolean canMakeNonTransitive(int[] ballA, int[] ballB) {
+        for (int c1 = 1; c1 <= 10; c1++) {
+            for (int c2 = 1; c2 <= 10; c2++) {
+                for (int c3 = 1; c3 <= 10; c3++) {
+                    for (int c4 = 1; c4 <= 10; c4++) {
+                        int[] ballC = {c1, c2, c3, c4};
+                        if (isNonTransitive(ballA, ballB, ballC)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private static boolean isNonTransitive(int[] ballA, int[] ballB, int[] ballC) {
+        double aBeatsB = winProbability(ballA, ballB);
+        double bBeatsC = winProbability(ballB, ballC);
+        double cBeatsA = winProbability(ballC, ballA);
+        
+        return (aBeatsB > 0.5 && bBeatsC > 0.5 && cBeatsA > 0.5) ||
+               (aBeatsB < 0.5 && bBeatsC < 0.5 && cBeatsA < 0.5);
+    }
+    
+    private static double winProbability(int[] ball1, int[] ball2) {
+        int wins = 0;
+        int ties = 0;
+        int total = 16;  
+        
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (ball1[i] > ball2[j]) {
+                    wins++;
+                } else if (ball1[i] == ball2[j]) {
+                    ties++;
+                }
+            }
+        }
+        
+        return (double) wins / (total - ties);
+    }
+}
