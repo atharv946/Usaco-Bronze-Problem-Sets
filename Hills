@@ -1,0 +1,82 @@
+
+Hills
+[ Memory: 16 MB, CPU: 1 sec ]
+
+Farmer John has N hills on his farm (1 <= N <= 1,000) of integer height in the range 0 .. 100. 
+
+Farmer John wants the maximum difference between the tallest hill and the shortest hill to be 17 units. If it costs 𝑥2
+ dollars to increase or decrease the height of a hill by x integer units, how much does Farmer John need to pay at minimum? 
+
+INPUT FORMAT
+
+Line 1: The integer N.
+Lines 2..1+N: Each line contains the height of a single hill.
+OUTPUT FORMAT
+
+Line 1: The minimum amount FJ needs to pay to modify his hills. 
+
+SAMPLE INPUT
+
+5
+20
+9
+3
+25
+22
+SAMPLE OUTPUT
+
+13
+FJ keeps the hills of heights 20, 9, and 22 as they are.  He increases the height of the hill of height 3 to 6, which costs 3^2 = 9. He shortens the hill of height 25 to 23 at a cost of 2^2 = 4. Hence the total is 9+4=13.
+
+My Code:
+import java.util.*;
+import java.io.*;
+
+public class Hills {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        int numberOfHills = scanner.nextInt();
+        int[] hills = new int[numberOfHills];
+        
+        for (int i = 0; i < numberOfHills; i++) {
+            hills[i] = scanner.nextInt();
+        }
+        
+        int minHeight = 10000000;
+        int maxHeight = 0;
+        
+        for (int i = 0; i < numberOfHills; i++) {
+            if (hills[i] < minHeight) {
+                minHeight = hills[i];
+            }
+            if (hills[i] > maxHeight) {
+                maxHeight = hills[i];
+            }
+        }
+       
+        int minCost = 1000000000;
+        
+        for (int amountIncrease = 0; amountIncrease <= (maxHeight - minHeight - 17); amountIncrease++) {
+            int amountDecrease = maxHeight - minHeight - 17 - amountIncrease;
+            int cost = 0;
+            
+            for (int i = 0; i < numberOfHills; i++) {
+                int height = hills[i];
+                if (height < minHeight + amountIncrease) {
+                    cost += (minHeight + amountIncrease - height) * (minHeight + amountIncrease - height);
+                } else if (height > maxHeight - amountDecrease) {
+                    cost += (height - (maxHeight - amountDecrease)) * (height - (maxHeight - amountDecrease));
+                }
+            }
+            
+            if (cost < minCost) {
+                 minCost = cost;
+            }
+        }
+        
+        System.out.println(minCost);
+        
+        scanner.close();
+    }
+}
