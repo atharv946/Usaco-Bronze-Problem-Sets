@@ -1,0 +1,103 @@
+COWVID-19
+[ Memory: 16 MB, CPU: 1 sec ]
+
+A new terrible disease, the COWVID-19, is spreading among cows worldwide. Scientists have just begun to realize how quickly this disease can spread.
+
+For the sake of simplicity, let’s say that Farmer John’scows are positioned on a number line. On Day 1, one cow is infected with this disease. That particular cow can now infect all the cows within a radius of 1. On day 2, all the newly infected cows can now infect cows within a radius of 2 from them (the virus has mutated to a stronger variant). On day 3, all the newly infected cows can now infect cows within a radius of 3, and so on…
+
+Currently, there are N (1 <= N <= 100) cows on Farmer John’s one-dimensional field. Given the positions of each cow, please help Farmer John determine the maximum number of cows that can be infected if one cow was to get sick on Day 1.
+
+INPUT FORMAT
+
+* Line 1: A single integer: N
+
+* Lines 2..N: Each line contains the position of the ith cow (an integer in the range 0...1,000,000,000)
+
+OUTPUT FORMAT
+
+A single integer representing the maximum number of cows that can be infected if one cow was to get sick on day 1.
+
+SAMPLE INPUT
+
+6
+6
+3
+9
+5
+7
+100
+SAMPLE OUTPUT
+
+5
+Let’s say the cow at position 6 got sick on Day 1. On Day 2, the disease was able to spread to the cows at positions 5 and 7. On day 3, the disease was able to further extend to cows at positions 3 and 9. On day 4, the disease would be contained (since the last cow is very far away).
+
+
+Code:
+
+
+// main function will calculate the indices of the cow that starts the infection(aka the cow on day 1)
+
+
+//make funtion(s) that will take in position array and make three arraylists containing the newly infected,the infected ones before , and the total infected  .
+//The function will use a while loop and output the value of infected cows for that starter cow.You can break the loop if the amount of new infected this round is not > 0.(We can also make more functions).
+// keep appending into the newlyinfected , oldinfected , and totalInfected. These arrays will stores the indices of the cows in the positions array.
+
+
+
+
+import java.util.*;
+import java.io.*;
+
+public class COWVID19 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        int N = scanner.nextInt(); 
+        int[] positions = new int[N];
+        for(int i = 0; i < N; i++) {
+            positions[i] = scanner.nextInt();
+        }
+        Arrays.sort(positions);
+        int max = 0;
+        for(int i = 0; i < N; i++) {
+            max = Math.max(calculateMax(i, positions), max);
+        }
+        System.out.print(max);
+    }
+
+    public static int calculateMax(int starter, int[] positions) {
+        ArrayList<Integer> newInfected = new ArrayList<>();
+        ArrayList<Integer> oldInfected = new ArrayList<>();
+        ArrayList<Integer> totalInfected = new ArrayList<>();
+
+        newInfected.add(starter);
+        totalInfected.add(starter);
+
+        int day = 1;
+        while (true) {
+            oldInfected.clear();
+            oldInfected.addAll(newInfected);
+            newInfected.clear();
+
+            for (int i = 0; i < positions.length; i++) {
+                if (!totalInfected.contains(i)) {
+                    for (int infected : oldInfected) {
+                        if (Math.abs(positions[i] - positions[infected]) <= day) {
+                            newInfected.add(i);
+                            totalInfected.add(i);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (newInfected.size() == 0) {
+                break;
+            }
+
+            day++;
+        }
+
+        return totalInfected.size();
+    }
+}
