@@ -1,0 +1,118 @@
+Game Stuck
+[ Memory: 64 MB, CPU: 1 sec ]
+
+Bessie is playing a game on her Cownsole! In the game, Bessie has a line of 𝑁(1≤𝑁≤100)
+ items, each with a unique integer ID from 1 to N. In the beginning, the items are sorted in ascending order, or in other words, item 𝑖
+ has ID 𝑖
+.
+
+In one move, Bessie can take two indexes on the line, and reverse the order of the items in the middle. Normally, she can change the indexes with buttons, however the buttons are jammed! Now, the Cownsole only executes two moves in repetition- reversing between 𝐴1
+ and 𝐴2
+, and then reversing between 𝐵1
+ and 𝐵2
+, after.
+Bessie estimates that it will take 𝐾(1≤𝐾≤109)
+ cycles, so 2𝐾
+ total moves, for the Cownsole to run out of battery. Now Bessie wonders, what is the last configuration of items before the Cownsole dies?
+
+INPUT FORMAT:
+
+The first line of input contains 𝑁
+ and 𝐾
+. The second line contains 𝐴1
+ and 𝐴2
+, and the third contains 𝐵1
+ and 𝐵2
+.
+
+OUTPUT FORMAT:
+
+On the 𝑖
+th line of output, print the label of the 𝑖
+th cow from the left at the end of the exercise routine.
+
+SAMPLE INPUT:
+
+5 2
+1 2
+2 5
+SAMPLE OUTPUT:
+
+5
+1
+3
+4
+2
+To start, the cows are in ascending order.
+
+1 2 3 4 5
+After the each move, the cows look like
+
+2 5 4 3 1
+5 1 3 4 2
+
+
+Code:
+
+import java.util.*;
+import java.io.*;
+
+public class GameStuck {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        int N = scanner.nextInt();
+        int K = scanner.nextInt(); 
+        int A1 = scanner.nextInt();
+        int A2 = scanner.nextInt();
+        int B1 = scanner.nextInt();
+        int B2 = scanner.nextInt();
+        int [] cow = new int [N];
+        int [] originalCow = new int[N];
+        for(int i = 0 ; i < N ; i++){
+            cow[i] = i + 1;
+        }
+        for(int i = 0 ; i < N ; i++){
+            originalCow[i] = i + 1;
+        }
+        int cycleLen = 0;
+        for(int i = 0 ; i < N * N ; i++){ 
+            
+            move(A1-1 , A2-1 ,cow);
+            move(B1-1 , B2-1 , cow);
+            cycleLen++;
+            if(arraysEqual(cow , originalCow , N)){
+                break;
+            }
+        }
+        int needed = K % cycleLen; 
+        for(int i = 0 ; i < needed ; i++){
+            move(A1 -1 , A2 -1 ,originalCow);
+            move(B1 -1 , B2 -1 , originalCow);
+        }
+        for(int i = 0 ; i < N ; i++){
+            System.out.println(originalCow[i]);
+        }
+    }
+    public static void move(int start , int end , int [] cow){
+            if (start < end) {
+                int middle = (end - start) / 2;
+                for (int k = 0; k <= middle; k++) {
+                    int first = cow[start + k];
+                    cow[start+k] = cow[end-k];
+                    cow[end-k] = first;
+                }
+            }
+            else {
+                return;
+            }
+    }
+    public static boolean arraysEqual(int [] cow , int [] originalCow , int N){
+        for(int i = 0 ; i < N ; i++){
+            if(!(originalCow[i] == cow[i])){
+                return false;
+            }
+        }
+        return true;
+    }
+}
