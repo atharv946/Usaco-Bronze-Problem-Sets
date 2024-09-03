@@ -1,0 +1,112 @@
+Pilot Shortage
+[ Memory: 64 MB, CPU: 1 sec ]
+In the remote wilderness, there are two small towns connected by two even smaller airports. The citizens regularly travel between the cities, but this week there is a problem: only one pilot is on staff!
+
+Each town currently has exactly 1000 residents and each airport is initially equipped with 10 airplanes with varying passenger capacities.
+
+Due to safety regulations, Pilot Paul will make exactly four flights throughout the week:
+
+On Tuesday, Pilot Paul takes a plane from the first town, fills it with passengers, and flies to the second town.
+On Wednesday, Pilot Paul takes a plane from the second town (maybe the one he flew on Tuesday), fills it with passengers, and flies to the first town.
+On Thursday, Pilot Paul takes a plane from the first town (maybe the one he flew on Wednesday), fills it with passengers, and flies to the second town.
+On Friday, Pilot Paul takes a plane from the second town (maybe the one he flew on Thursday or Tuesday), fills it with passengers, and flies to the first town.
+The population of the first town at the end of the week depends on which planes Pilot Paul chooses to fly. Your objective is to determine the number of different population counts in town 1 we can observe on Friday. Assume that there is no other way people enter or leave the two towns and that each flight is flying at full capacity.
+
+INPUT FORMAT
+
+The first line of input contains 10 integers representing the capacities of the airplanes currently in town 1. The second line of input contains 10 integers representing the capacities of the airlines currently in town 2.
+
+All airplane capacities range from 1 to 100 people.
+
+OUTPUT FORMAT
+
+Output the number of possible population counts in the first town after the final flight on Friday.
+
+SAMPLE INPUT
+
+2 2 2 2 2 3 3 3 3 3
+7 7 7 7 7 7 7 7 7 7
+SAMPLE OUTPUT
+
+6
+Explanation: The following values are possible:
+
+1000: Pilot Paul always flies the same airplane back and forth, resulting in no change.
+1004: Pilot Paul flies 3 people on Tuesday, 7 people on Wednesday, then 2 people on Thursday and Friday
+1005: Pilot Paul flies 2 people on Tuesday, 7 people on Wednesday, then 2 people on Thursday and Friday
+1008: Pilot Paul flies 3 people on Tuesday, 7 people on Wednesday, then 3 people on Thursday, and 7 people on Friday
+1009: Pilot Paul flies 2 people on Tuesday, 7 people on Wednesday, then 3 people on Thursday, and 7 people on Friday
+1010: Pilot Paul flies 2 people on Tuesday, 7 people on Wednesday, then 2 people on Thursday, and 7 people on Friday
+
+
+Code:
+
+import java.util.*;
+import java.io.*;
+
+public class PilotShortage {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<Integer> A = new ArrayList<Integer>();
+        ArrayList<Integer> B = new ArrayList<Integer>();
+        for(int i = 0 ;  i < 10 ; i++){
+            A.add(scanner.nextInt());
+        
+        }
+        for(int i = 0 ;  i < 10 ; i++){
+            B.add(scanner.nextInt());
+        
+        }
+        ArrayList<Integer> availableA = new ArrayList<Integer>(A);
+        ArrayList<Integer> availableB = new ArrayList<Integer>(B);
+        int popA = 1000;
+        int popB = 1000;
+        HashSet<Integer> populations = new HashSet<Integer>();
+        for(int i = 0; i < availableA.size(); i++) {
+            int add1 = availableA.get(i);
+            availableB.add(add1);
+            availableA.remove(i);
+            popA = popA - add1;
+            popB = popB + add1;
+            for(int j = 0; j < availableB.size(); j++){
+                int add2 = availableB.get(j);
+                availableA.add(add2);
+                availableB.remove(j);
+                popA = popA + add2;
+                popB = popB - add2;
+                for(int k = 0; k < availableA.size(); k++){
+                    int add3 = availableA.get(k);
+                    availableB.add(add3);
+                    availableA.remove(k);
+                    popA = popA - add3;
+                    popB = popB + add3;
+                    for(int l = 0; l < availableB.size(); l++){
+                        int add4 = availableB.get(l);
+                        availableA.add(add4);
+                        availableB.remove(l);
+                        popA = popA + add4;
+                        popB = popB - add4;
+                        populations.add(popA);
+                        availableA.remove(availableA.size() - 1);
+                        availableB.add(l, add4);
+                        popA = popA - add4;
+                        popB = popB + add4;
+                    }
+                    availableB.remove(availableB.size() - 1);
+                    availableA.add(k, add3);
+                    popA = popA + add3;
+                    popB = popB - add3;
+                }
+                availableA.remove(availableA.size() - 1);
+                availableB.add(j, add2);
+                popA = popA - add2;
+                popB = popB + add2;
+            }
+            availableB.remove(availableB.size() - 1);
+            availableA.add(i, add1);
+            popA = popA + add1;
+            popB = popB - add1;
+        }
+        System.out.print(populations.size());
+    }
+}
