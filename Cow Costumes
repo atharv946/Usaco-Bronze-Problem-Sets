@@ -1,0 +1,77 @@
+Cow Costumes
+[ Memory: 64 MB, CPU: 1 sec ]
+
+A collection of N sheep (1 <= N <= 1000) are trying to infiltrate Farmer John’s Farm by dressing up as cows. They currently have two types of costumes: Guernseys and Holsteins. After donning their costumes and lining up, Moriarty the Master Sheep realizes their plan will fail unless they match the order of cows on Farmer John’s field exactly.
+
+To fix this issue, Moriarty will issue a series of commands to his sheep army. Each command consists of two integers X and Y. Given a command, all sheep in positions between X and Y will switch costumes (Guernseys will turn into Holsteins and vice versa).
+
+Given a length N string of G’s and H’s representing the current order of the sheep and a second length N string of G’s and H’s representing the order of the cows on Farmer John’s field, determine the minimum number of commands that Moriarty must issue.
+
+INPUT FORMAT
+
+The first line of input contains the integer N, representing the number of cows.
+The second line contains string A, representing the current order of the sheep.
+The third line contains string B, representing the order of the cows on FJ’s farm.
+
+Each string consists of N characters that are either H (Holstein) or G (Guernsey).
+
+OUTPUT FORMAT
+
+Print the minimum number of commands Moriarty must issue to transform string A into string B.
+
+SAMPLE INPUT
+
+6
+GGGHHH
+HHGGGG
+SAMPLE OUTPUT
+
+2
+Moriarty can issue the following commands:
+
+original:     GGGHHH
+command 1..6: HHHGGG
+command 3..3: HHGGGG
+to arrive at the desired ordering.
+
+
+Code:
+
+
+import java.util.*;
+import java.io.*;
+
+public class CowCostumes {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        int N = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline
+        String sheep = scanner.nextLine();
+        String cows = scanner.nextLine();  
+        
+        int[] flips = new int[N]; // 0 means flip is not needed, 1 means flip is needed
+        for(int i = 0; i < N; i++){
+            if(sheep.charAt(i) != cows.charAt(i)){
+                flips[i] = 1;
+            }
+        }
+        
+        int count = 0;
+        boolean inStreak = false;
+        for(int i = 0; i < N; i++){
+            if(flips[i] == 1){
+                if(!inStreak){
+                    count++;
+                    inStreak = true;
+                }
+            } else {
+                inStreak = false;
+            }
+        }
+        
+        System.out.println(count);
+        
+        scanner.close();
+    }
+}
