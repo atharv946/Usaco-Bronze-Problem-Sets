@@ -1,0 +1,255 @@
+Stamp Grid
+[ Memory: 64 MB, CPU: 1 sec ]
+A stamp painting is a black and white painting on an 𝑁×𝑁
+ canvas, where certain cells are inked while others are blank. It can be described by an 𝑁×𝑁
+ array of characters (1≤𝑁≤20
+). The 𝑖
+th entry of the 𝑗
+th column of the array is equal to * if the canvas contains ink at that square and . otherwise.
+
+Bessie has a stamp painting that she would like to create, so Farmer John has lent her a single 𝐾×𝐾
+ (1≤𝐾≤𝑁
+) stamp to do this and an empty 𝑁×𝑁
+ canvas. Bessie can repeatedly rotate the stamp clockwise by 90∘
+ and stamp anywhere on the grid as long as the stamp is entirely inside the grid. Formally, to stamp, Bessie chooses integers 𝑖,𝑗
+ such that 𝑖∈[1,𝑁−𝐾+1]
+ and 𝑗∈[1,𝑁−𝐾+1]
+; for each (𝑖′,𝑗′)
+ such that 1≤𝑖′,𝑗′≤𝐾
+, canvas cell (𝑖+𝑖′−1,𝑗+𝑗′−1)
+ is painted black if the stamp has ink at (𝑖′,𝑗′)
+. Bessie can rotate the stamp at any time between stampings. Once a canvas cell is painted black, it remains black.
+
+Farmer John is wondering whether it's possible for Bessie to create her desired stamp painting with his stamp. For each of 𝑇
+ (1≤𝑇≤100
+) test cases, help Farmer John answer this question.
+
+INPUT FORMAT:
+
+The first line of input contains 𝑇
+, the number of test cases.
+Each test case starts with an integer 𝑁
+ followed by 𝑁
+ lines, each containing a string of *s and .s, representing Bessie's desired stamp painting. The next line contains 𝐾
+ and is followed by 𝐾
+ lines, each containing a string of *s and .s, representing Farmer John's stamp.
+
+Consecutive test cases are separated by newlines.
+
+OUTPUT FORMAT:
+
+For each test case, output "YES" or "NO" on separate lines.
+
+
+SAMPLE INPUT:
+
+4
+
+2
+**
+*.
+1
+*
+
+3
+.**
+.**
+***
+2
+.*
+**
+
+3
+...
+.*.
+...
+3
+.*.
+...
+...
+
+3
+**.
+.**
+..*
+2
+.*
+*.
+SAMPLE OUTPUT:
+
+YES
+YES
+NO
+YES
+In the first test case, Bessie can perform the following sequence of stampings:
+
+Stamp at (1,1)
+Stamp at (1,2)
+Stamp at (2,1)
+In the second test case, Bessie can perform the following sequence of stampings:
+
+Stamp at (2,2)
+Stamp at (2,1)
+Rotate 90∘
+Rotate 90∘
+Stamp at (1,2)
+In the third test case, it is impossible to paint the middle cell.
+
+In the fourth test case, Bessie can perform the following sequence of stampings:
+
+Rotate 90∘
+Stamp at (1,1)
+Stamp at (1,2)
+Stamp at (2,2)
+Problem credits: Benjamin Qi and Claire Zhang
+
+
+Code:
+
+import java.util.*;
+import java.io.*;
+public class StampGrid {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int T = scanner.nextInt();
+        scanner.nextLine();
+        // read painting
+        for(int i = 0 ; i < T ; i++) {
+            scanner.nextLine();
+            int N = scanner.nextInt();
+            scanner.nextLine();
+            int [][] painting = new int[N][N];
+            for(int j = 0 ; j < N ; j++) {
+                String input = scanner.nextLine();
+                for(int k = 0 ; k < N ; k++){
+                    if (input.charAt(k) == '.') {
+                        painting[j][k] = 0;
+                    } else {
+                        painting[j][k] = 1;
+                    }
+                }
+            }
+            int K = scanner.nextInt();
+            scanner.nextLine();
+            // read stamp
+            int [][] stamp = new int[K][K];
+            for(int j = 0 ; j < K ; j++) {
+                String input = scanner.nextLine();
+                for(int k = 0 ; k < K ; k++){
+                    if (input.charAt(k) == '.') {
+                        stamp[j][k] = 0;
+                    } else {
+                        stamp[j][k] = 1;
+                    }
+                }
+            }
+            int[][] stamp90 = new int[K][K];
+            int[][] stamp180 = new int[K][K];
+            int[][] stamp270 = new int[K][K];
+            rotate(stamp, stamp90, K);
+            rotate(stamp90, stamp180, K);
+            rotate(stamp180, stamp270, K);
+            
+            ArrayList<Integer> allowedRows = new ArrayList<Integer>();
+            ArrayList<Integer> allowedCols = new ArrayList<Integer>();
+            ArrayList<Integer> allowedRows90 = new ArrayList<Integer>();
+            ArrayList<Integer> allowedCols90 = new ArrayList<Integer>();
+            ArrayList<Integer> allowedRows180 = new ArrayList<Integer>();
+            ArrayList<Integer> allowedCols180 = new ArrayList<Integer>();
+            ArrayList<Integer> allowedRows270 = new ArrayList<Integer>();
+            ArrayList<Integer> allowedCols270 = new ArrayList<Integer>();
+           
+            
+            for (int row = 0; row < (N-K+1); row++) {
+                for (int col = 0; col < (N-K+1); col++) {
+                    if (IsStampAllowed(painting, stamp, N, K, row, col)) {
+                        allowedRows.add(row);
+                        allowedCols.add(col);
+                    }
+                    if (IsStampAllowed(painting, stamp90, N, K, row, col)) {
+                        allowedRows90.add(row);
+                        allowedCols90.add(col);
+                    }
+                    if (IsStampAllowed(painting, stamp180, N, K, row, col)) {
+                        allowedRows180.add(row);
+                        allowedCols180.add(col);
+                        
+                    }
+                    if (IsStampAllowed(painting, stamp270, N, K, row, col)) {
+                        allowedRows270.add(row);
+                        allowedCols270.add(col);
+                    }
+                }
+            }
+            
+            int[][] tempPainting = new int[N][N];
+            // initialize tempPainting
+            for (int row = 0; row < N; row++) {
+                for (int col = 0; col < N; col++) {
+                    tempPainting[row][col] = 0;
+                }
+            }
+            for (int j = 0; j < allowedRows.size(); j++) {
+                ModifyPainting(tempPainting, stamp, N, K, allowedRows.get(j), allowedCols.get(j));
+            }
+            for (int j = 0; j < allowedRows90.size(); j++) {
+                ModifyPainting(tempPainting, stamp90, N, K, allowedRows90.get(j), allowedCols90.get(j));
+            }
+            for (int j = 0; j < allowedRows180.size(); j++) {
+                ModifyPainting(tempPainting, stamp180, N, K, allowedRows180.get(j), allowedCols180.get(j));
+            }
+            for (int j = 0; j < allowedRows270.size(); j++) {
+                ModifyPainting(tempPainting, stamp270, N, K, allowedRows270.get(j), allowedCols270.get(j));
+            }
+            if(comparePaintings(painting, tempPainting, N)) {
+                System.out.println("YES");
+            } else {
+                System.out.println("NO");
+            }
+        }
+    }
+        
+        
+    public static boolean IsStampAllowed(int[][] painting, int [][] stamp, int N, int K, int rowStart, int colStart) {
+        for (int row = rowStart; row < rowStart+K; row++) {
+            for (int col = colStart; col < colStart+K; col++) {
+                if (painting[row][col] == 0 && stamp[row-rowStart][col-colStart] == 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    public static void ModifyPainting(int[][] tempPainting, int[][] stamp, int N, int K, int rowStart, int colStart) {
+        for (int row = rowStart; row < rowStart+K; row++) {
+            for (int col = colStart; col < colStart+K; col++) {
+                if (tempPainting[row][col] == 1) {
+                    continue;
+                }
+                tempPainting[row][col] = stamp[row-rowStart][col-colStart];
+            }
+        }
+    }
+    
+    public static boolean comparePaintings(int[][] painting, int[][] tempPainting,int N) {
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
+                // System.out.print(tempPainting[row][col]);
+                if (painting[row][col] != tempPainting[row][col]) {
+                    return false;
+                }
+            }
+            // System.out.println();
+        }
+        return true;
+    }
+    // check this
+    public static void rotate(int[][] Stamp, int[][] rotatedStamp, int K) {
+        for (int row = 0; row < K; row++) {
+            for (int col = 0; col < K; col++) {
+                rotatedStamp[col][K - 1 - row] = Stamp[row][col];
+            }
+        }
+    }
+}
