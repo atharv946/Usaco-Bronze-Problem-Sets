@@ -1,0 +1,113 @@
+Counting COWs
+[ Memory: 256 MB, CPU: 2 sec ]
+
+Farmer John has been storing data on the number of cows he has in a plain-text file. He has stored a length N (1 ≤ N ≤ 200,000) string with the letters C, O, and W. The number of cows on his farm is equal to the number of substrings of the form: COO...OOW. That is, substrings which start with a C, have an arbitrary nonzero number of O’s, and then end with a W. Unfortunately, there has been an attack on Farmer John’s servers and a portion of his data has been corrupted!
+
+Some of the string’s characters have been replaced with the symbol ‘*’ and it is impossible to recover what the character used to be. Farmer John needs your help to estimate the number of cows on his farm. To aid Farmer John, please calculate the minimum and maximum number of cows that are possibly on his farm given the corrupted data.
+
+INPUT FORMAT:
+
+Line 1: One integer: N
+Line 2: One length N string
+OUTPUT FORMAT:
+
+Line 1: The minimum number of CO...OW substrings that can appear
+Line 2: The maximum number of CO...OW substrings that can appear
+SAMPLE INPUT:
+
+13
+COW***CO*O*OW
+SAMPLE OUTPUT:
+
+2
+4
+Explanation: For the minimum number of cows, we could write COWWWWCOOOOOW for a total of 2 cows. For the maximum number of cows, we could write COWCOWCOWOCOW for a total of 4 cows.
+
+SCORING:
+
+Test cases 1-5: satisfy N ≤ 100 and number of corrupted characters ≤ 10.
+Test cases 6-10: satisfy N ≤ 2000 and it is guaranteed that minimum = 0.
+Test cases 11-20: no additional constraints.
+
+
+import java.util.*;
+
+public class CountingcOWS {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        int N = scanner.nextInt();
+        scanner.nextLine(); 
+        String str = scanner.nextLine();
+        
+        System.out.println(countMin(str, N));
+        System.out.println(countMax(str, N));
+        
+        scanner.close();
+    }
+    
+    public static int countMin(String str, int N) {
+        char[] min = str.toCharArray();
+        String letters = "COW";
+        int index = 0;
+        int ans = 0;
+        
+        for (int s = 0; s < N; s++) {
+            if (s > 0 && min[s] == min[s - 1]) {
+                continue;
+            }
+            if (min[s] == letters.charAt(index)) {
+                index++;
+                if (index == 3) {
+                    ans++;
+                    index = 0;
+                }
+            } else if (min[s] == '*') {
+                if (index < 2) {
+                    index = 0;
+                    min[s] = 'W';
+                } else {
+                    index = 1;
+                    min[s] = 'C';
+                }
+            } else {
+                if (min[s] == 'C') {
+                    index = 1;
+                } else {
+                    index = 0;
+                }
+            }
+        }
+        
+        return ans;
+    }
+    
+    public static int countMax(String str, int N) {
+        char[] max = str.toCharArray();
+        String letters = "COW";
+        int index = 0;
+        int ans = 0;
+        
+        for (int s = 0; s < N; s++) {
+            if (s > 0 && max[s] == max[s - 1]) {
+                continue;
+            }
+            if (max[s] == letters.charAt(index) || max[s] == '*') {
+                max[s] = letters.charAt(index);
+                index++;
+                if (index == 3) {
+                    index = 0;
+                    ans++;
+                }
+            } else {
+                if (max[s] == 'C') {
+                    index = 1;
+                } else {
+                    index = 0;
+                }
+            }
+        }
+        
+        return ans;
+    }
+}
