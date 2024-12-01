@@ -1,0 +1,153 @@
+Elementary, my dear Moo-son!
+[ Memory: 256 MB, CPU: 2 sec ]
+
+
+You are investigating a robbery at a bank with N (1 <= N <= 1000) safety deposit boxes, labeled 1 to N. Your suspect list includes three cows: Bessie, Elsie, and Mildred. You are absolutely certain that at least one of the cows committed the crime, but you do not know which one is responsible or if multiple cows collaborated. Your organization has been collecting data on Bessie’s gang for awhile and has developed the following MO:
+
+
+Bessie, Elsie, and Mildred have K_B, K_E, and K_M favorite numbers respectively (1 <= K_B, K_E, K_M <= 10).
+A cow will only steal from deposit boxes divisible by at least one of her favorite numbers
+There is one exception: a cow will not open a box that is divisible by any of her accomplices’ favorite numbers.
+The working theory is that the cows are inherently lazy, so they always make the mistake of assuming the other cow(s) will do the work for them.
+
+You are still waiting on an accurate count of the number of safety deposit boxes robbed, but right now you know that the number robbed is one of T (1 <= T <= 5) different values D_i (1 <= D_i <= N).
+
+For each value of D_i, given lists of Bessie, Elsie, and Mildred’s favorite numbers, determine which cows must have committed the crime. If multiple cows collaborated, print their names in alphabetical order. If two or more different combinations of cows could have robbed the safety deposit boxes, print “insufficient knowledge”.
+
+INPUT FORMAT:
+
+Line 1: Two integers: N, T
+Line 2: T integers: D_1,...,D_T
+Line 3: Three integers: K_B, K_E, K_M
+Line 4: K_B integers: Bessie’s favorite numbers
+Line 5: K_E integers: Elsie’s favorite numbers
+Line 6: K_M integers: Mildred’s favorite numbers
+OUTPUT FORMAT:
+
+Lines 1...T: The names of the collaborators responsible for robbing the bank in alphabetical order separated by spaces or the phrase “insufficient knowledge”
+
+SAMPLE INPUT:
+
+5 2
+3 5
+1 2 3
+1 
+2 3
+1 2 3
+SAMPLE OUTPUT:
+
+Elsie
+insufficient knowledge
+On her own, Bessie would rob deposit boxes (1,2,3,4,5). Elsie would rob (2,3,4). Mildred would rob (1,2,3,4,5). If Bessie and Mildred worked together, no boxes would get robbed. If Elsie worked with either Bessie or Mildred, boxes (1,5) would be robbed. Therefore, if 3 boxes got robbed, Elsie must have done it alone. If 5 boxes got robbed, we do not know if it was Bessie or Mildred.
+
+
+
+import java.util.*;
+
+public class CowRobbery {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        int N = scanner.nextInt();
+        int T = scanner.nextInt();
+        int[] D = new int[T];
+        for (int i = 0; i < T; i++) {
+            D[i] = scanner.nextInt();
+        }
+        
+        int K_B = scanner.nextInt();
+        int K_E = scanner.nextInt();
+        int K_M = scanner.nextInt();
+        
+        int[] bessie = new int[K_B];
+        for (int i = 0; i < K_B; i++) {
+            bessie[i] = scanner.nextInt();
+        }
+        
+        int[] elsie = new int[K_E];
+        for (int i = 0; i < K_E; i++) {
+            elsie[i] = scanner.nextInt();
+        }
+        
+        int[] mildred = new int[K_M];
+        for (int i = 0; i < K_M; i++) {
+            mildred[i] = scanner.nextInt();
+        }
+        
+        for (int i : D) {
+            String result = solveScenario(N, i, bessie, elsie, mildred);
+            System.out.println(result);
+        }
+        
+        scanner.close();
+    }
+    
+    public static String solveScenario(int N, int d, int[] bessie, int[] elsie, int[] mildred) {
+        List<String> possibleCulprits = new ArrayList<>();
+        
+        // Check all combinations
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(bessie))) == d) {
+            possibleCulprits.add("Bessie");
+        }
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(elsie))) == d) {
+            possibleCulprits.add("Elsie");
+        }
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(mildred))) == d) {
+            possibleCulprits.add("Mildred");
+        }
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(bessie, elsie))) == d) {
+            possibleCulprits.add("Bessie Elsie");
+        }
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(bessie, mildred))) == d) {
+            possibleCulprits.add("Bessie Mildred");
+        }
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(elsie, mildred))) == d) {
+            possibleCulprits.add("Elsie Mildred");
+        }
+        if (countRobbedBoxes(N, new ArrayList<>(Arrays.asList(bessie, elsie, mildred))) == d) {
+            possibleCulprits.add("Bessie Elsie Mildred");
+        }
+        
+        if (possibleCulprits.size() == 1) {
+            return possibleCulprits.get(0);
+        } else {
+            return "insufficient knowledge";
+        }
+    }
+    
+    public static int countRobbedBoxes(int N, ArrayList<int[]> cowArrays) {
+        int count = 0;
+        for (int box = 1; box <= N; box++) {
+            boolean robbed = false;
+            for (int i = 0; i < cowArrays.size(); i++) {
+                if (canRobBox(box, cowArrays.get(i), cowArrays, i)) {
+                    robbed = true;
+                    break;
+                }
+            }
+            if (robbed) count++;
+        }
+        return count;
+    }
+    
+    public static boolean canRobBox(int box, int[] cowArray, ArrayList<int[]> allArrays, int cowIndex) {
+        for (int favorite : cowArray) {
+            if (box % favorite == 0) {
+                boolean canRob = true;
+                for (int i = 0; i < allArrays.size(); i++) {
+                    if (i != cowIndex) {
+                        for (int otherFavorite : allArrays.get(i)) {
+                            if (box % otherFavorite == 0) {
+                                canRob = false;
+                                break;
+                            }
+                        }
+                        if (!canRob) break;
+                    }
+                }
+                if (canRob) return true;
+            }
+        }
+        return false;
+    }
+}
