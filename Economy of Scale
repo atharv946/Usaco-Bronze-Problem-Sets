@@ -1,0 +1,105 @@
+Economy of Scale
+[ Memory: 256 MB, CPU: 2 sec ]
+
+Farmer John’s new direct-to-consumer shipping operation has transformed his barn into a bustling distribution center. With N conveyor belts, each loaded with M boxes labeled by customer number (ranging from 0 to 1,000,000), the barn quickly became chaotic as boxes were loaded onto the belts in random order. To streamline the distribution process and avoid costly errors, Farmer John needs each conveyor belt to have the boxes in the exact same order.
+
+To achieve this outcome, Farmer John is allowed to perform the following operation on any working conveyor belt: remove a box from the left side of a conveyor belt and add a new box (with any number of Farmer John's choosing) to the right side of the conveyor belt. Unfortunately, exactly one conveyor belt is broken and the boxes on it cannot move. 
+
+Farmer John wants you to determine the minimum number of operations needed to make the order of boxes on each conveyor belt identical. While the location of the broken conveyor belt is unknown to you, you may assume that the broken conveyor belt is in the most advantageous position. In other words, print the minimum number of operations across all possible broken conveyor belt locations. 
+
+It is guaranteed that N*M ≤ 2,000. 
+
+INPUT FORMAT
+
+Line 1: Two integers: N, the number of conveyors belts, and M, the number of boxes per conveyor belt. 
+The next N lines each contain M space separated integers, the labeled boxes currently on each conveyor belt.
+
+OUTPUT FORMAT
+
+Line 1: One integer, the minimum number of operations required to put the boxes on all conveyor belts in the same order (assuming one conveyor belt is broken). 
+
+SAMPLE INPUT 
+
+3 4
+1 4 4 4
+4 3 2 1
+3 2 1 5
+SAMPLE OUTPUT
+
+5
+If the 3rd conveyor belt is broken, we can transform the 1st conveyor belt into the 3rd using 4 operations:
+
+1 4 4 4 -> 4 4 4 3 -> 4 4 3 2 -> 4 3 2 1 -> 3 2 1 5
+Further, we can transform the 2nd conveyor belt into the 3rd using 1 operation: 
+
+4 3 2 1 -> 3 2 1 5
+This gives us a total of 5 operations.
+
+SCORING
+
+In test cases 2-4, M = 2.
+In test cases 5-7, N = 2.
+In test cases 8-11, no additional constraints.
+
+
+
+
+
+
+
+import java.util.*;
+
+public class EconomyOfScale {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int m = scanner.nextInt();
+        
+        int[][] belts = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                belts[i][j] = scanner.nextInt();
+            }
+        }
+        
+        int minOperations = 10000000;
+        
+        for (int brokenBelt = 0; brokenBelt < n; brokenBelt++) {
+            int operations = 0;
+            for (int i = 0; i < n; i++) {
+                if (i != brokenBelt) {
+                    operations += operationsNeeded(belts[i], belts[brokenBelt]);
+                }
+            }
+            minOperations = Math.min(minOperations, operations);
+        }
+        
+        System.out.println(minOperations);
+    }
+    
+    public static int operationsNeeded(int[] source, int[] target) {
+        return findSameNums(source, target);
+    }
+    
+    public static int findSameNums(int[] source, int[] target) {
+        int endOverlap = 0;
+        for (int i = 0; i < source.length ; i++) {
+            if (restMatching(source , target , i)) {
+                endOverlap = source.length - i;
+                break;
+            } else {
+                continue;
+            }
+        }
+        return source.length - endOverlap;
+    }
+    
+    public static boolean restMatching(int[] source, int[] target, int index) {
+        for (int i = index; i < source.length; i++) {
+            if (source[i] != target[i - index]) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
