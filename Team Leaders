@@ -1,0 +1,83 @@
+Team Leaders
+[ Memory: 256 MB, CPU: 2 sec ]
+
+In preparation for the Winter Farm Festival, Farmer John has lined up his N (1 ≤ N ≤ 200,000) cows and divided them into teams. Each cow belongs to a team identified by a number, Tᵢ (1 ≤ Tᵢ ≤ 200,000). The teams are arranged in no particular order, so cows from different teams may appear in any sequence along the lineup. However, each team is guaranteed to have an odd number of cows. Bessie, Farmer John’s favorite cow, has been given the honor of selecting the team leader for each team.
+
+To aid each team’s communication, Bessie chose the cow in the middle of each team. In other words, the team leader of each team has the same number of teammates to her left and her right. 
+
+Given the team number assigned to each cow in the lineup, determine the minimum and maximum distance between any pair of team leaders.
+
+INPUT FORMAT
+
+Line 1: One integer: N, the number of cows.
+Line 2: N space separated integers: the values Tᵢ denoting the team of each cow in the line.
+
+OUTPUT FORMAT
+
+Line 1: The minimum distance between any pair of team leaders
+Line 2: The maximum distance between any pair of team leaders
+
+SAMPLE INPUT
+
+11
+1 2 7 7 2 7 2 2 2 2 2
+SAMPLE OUTPUT
+
+3
+7
+Team 1's leader is in position 0, team 7's leader is in position 3, and team 2's leader is in position 7. Hence, the minimum distance between leaders is 3 and the maximum is 7. 
+
+SCORING
+
+In test cases 2-3, it is guaranteed that N ≤ 1,000 and there are always three teams: 1, 2, and 3.
+In test cases 4-6, it is guaranteed that N ≤ 1,000 and Tᵢ ≤ 1,000.
+In test cases 7-11, there are no additional constraints. 
+
+
+
+import java.util.*;
+
+public class TeamLeaders {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int N = scanner.nextInt();
+        
+        Map<Integer, List<Integer>> teamPositions = new HashMap<>();
+        
+        for (int i = 0; i < N; i++) {
+            int team = scanner.nextInt();
+          
+            if (!teamPositions.containsKey(team)) { // containsKey is to find if the map has the team yet so yeah
+                // If not on map then create new list
+                ArrayList<Integer> positions = new ArrayList<>();
+                teamPositions.put(team, positions);
+            }
+           
+            List<Integer> positions = teamPositions.get(team);
+            positions.add(i);
+        }
+        
+        int[] leaderPositions = new int[teamPositions.size()];
+        int index = 0;
+
+        for (List<Integer> positions : teamPositions.values()) {
+            leaderPositions[index++] = positions.get(positions.size() / 2);
+        }
+        
+        // Sort  to calculate distances
+        Arrays.sort(leaderPositions);
+        
+        int minDistance = 10000000;
+        int maxDistance = leaderPositions[leaderPositions.length - 1] - leaderPositions[0];
+        
+        for (int i = 1; i < leaderPositions.length; i++) {
+            int distance = leaderPositions[i] - leaderPositions[i - 1];
+            minDistance = Math.min(minDistance, distance);
+        }
+        
+        System.out.println(minDistance);
+        System.out.println(maxDistance);
+        
+        scanner.close();
+    }
+}
